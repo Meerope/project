@@ -3,94 +3,65 @@ class Program
 {
     static void Main()
     {
-        var team = new ResearchTeam("Машинное обучение", "ИТИ БГУ", 1001, TimeFrame.Year);
-        Console.WriteLine("ToShortString():");
-        Console.WriteLine(team.ToShortString());
-        Console.WriteLine();
+        // Задание 1
+        Person p1 = new Person();
+        Person p2 = new Person("Иван", "Иванов", new DateTime(1985, 5, 12));
+        Console.WriteLine(p1.ToShortString());
+        Console.WriteLine(p1.ToString());
+        Console.WriteLine(p2.ToShortString());
+        Console.WriteLine(p2.ToString());
 
-        Console.WriteLine("Индексаторы по TimeFrame:");
-        Console.WriteLine($"Year: {team[TimeFrame.Year]}");
-        Console.WriteLine($"TwoYears: {team[TimeFrame.TwoYears]}");
-        Console.WriteLine($"Long: {team[TimeFrame.Long]}");
-        Console.WriteLine();
+        // Задание 2
+        Person anna = new Person("Анна", "Сидоровна", new DateTime(2000, 3, 15));
+        anna.Y = 1999;
 
-        team.Topic = "Нейронные сети для анализа текстов";
-        team.Organization = "Лаборатория ИИ";
-        team.RegNumber = 20251203;
-        team.Duration = TimeFrame.TwoYears;
-        team.Papers = Array.Empty<Paper>();
-        Console.WriteLine("ToString() после присвоения свойств:");
-        Console.WriteLine(team.ToString());
-        Console.WriteLine();
+        // Задание 3
+        TimeFrame year = TimeFrame.Year;
+        TimeFrame twoYears = TimeFrame.TwoYears;
+        TimeFrame longTime = TimeFrame.Long;
 
-        var author1 = new Person("Тимур", "Сергеев", new DateTime(1995, 4, 12));
-        var author2 = new Person("Анна", "Ковалёва", new DateTime(1994, 11, 3));
+        Console.WriteLine(year);
+        Console.WriteLine(twoYears);
+        Console.WriteLine(longTime);
 
-        var paper1 = new Paper("Контекстные эмбеддинги в русскоязычных корпусах", author1, new DateTime(2023, 10, 1));
-        var paper2 = new Paper("Оптимизация токенизации для морфологически богатых языков", author2, new DateTime(2024, 5, 20));
-        var paper3 = new Paper("Мультимодальные модели для извлечения знаний", author1, new DateTime(2025, 2, 14));
+        // Задание 4
+        Person petr =  new Person("Пётр", "Петров", new DateTime(1970, 1, 1));
+        Paper paper = new Paper("Современные технологии", petr, new DateTime(2020, 1, 20));
+        Console.WriteLine(paper.ToString());
 
-        team.AddPapers(paper1, paper2, paper3);
-        Console.WriteLine("ToString() после AddPapers:");
-        Console.WriteLine(team.ToString());
-        Console.WriteLine();
+        // Задание 5
+        Person maria = new Person("Мария", "Кузнецова", new DateTime(1980, 10, 10));
+        Paper paper3 = new Paper("Наука и жизнь", maria,  new DateTime(2019, 5, 15));
+        paper3.Title = "Научные открытия";
+        paper3.Date = new DateTime(2021, 6, 1);
 
-        Console.WriteLine("Самая поздняя публикация:");
-        Console.WriteLine(team.LatestPaper?.ToString() ?? "Нет публикаций");
-        Console.WriteLine();
+        // Задание 6
+        ResearchTeam ai = new ResearchTeam("Искуственный Интеллект", "TechLab", 101, TimeFrame.Year);
+        Console.WriteLine(ai.ToShortString());
 
-        Console.WriteLine("Введите nrow и ncolumn в одной строке. Допустимые разделители: пробел, запятая, точка с запятой, табуляция");
-        Console.Write("Например: 500, 20 или 500;20 или 500 20: ");
-        var input = Console.ReadLine();
-        var parts = input.Split(new[] { ' ', ',', ';', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        // Задание 7
+        ResearchTeam genetika = new ResearchTeam("Генетика", "BioCenter", 202, TimeFrame.TwoYears);
+        Console.WriteLine(genetika[TimeFrame.Year]);
+        Console.WriteLine(genetika[TimeFrame.TwoYears]);
+        Console.WriteLine(genetika[TimeFrame.Long]);
 
-        int nrow = int.Parse(parts[0]);
-        int ncolumn = int.Parse(parts[1]);
-        int total = nrow * ncolumn;
+        // Задание 8
+        ResearchTeam defaultTeam = new ResearchTeam();
+        defaultTeam.Topic = "Космос";
+        defaultTeam.Organization = "SpaceCorp";
+        defaultTeam.RegNumber = 303;
+        defaultTeam.Duration = TimeFrame.Long;
 
-        var oneD = new Paper[total];
-        for (int i = 0; i < total; i++)
-            oneD[i] = new Paper();
+        Person author1 = new Person("Иван", "Иванов",  new DateTime(1985, 5, 12));
+        Person author2 = new Person("Анна", "Сидорова",  new DateTime(2000, 3, 15));
 
-        var rect = new Paper[nrow, ncolumn];
-        for (int i = 0; i < nrow; i++)
-            for (int j = 0; j < ncolumn; j++)
-                rect[i, j] = new Paper();
+        Paper paper1 = new Paper("Марс", author1, new DateTime(2020, 1, 1));
+        Paper paper2 = new Paper("Луна", author1, new DateTime(2021, 6, 1));
 
-        var jag = new Paper[nrow][];
-        for (int i = 0; i < nrow; i++)
-        {
-            jag[i] = new Paper[ncolumn];
-            for (int j = 0; j < ncolumn; j++)
-                jag[i][j] = new Paper();
-        }
+        defaultTeam.Papers = new[] {paper1, paper2};
 
-        var newTitle = "Обновлённый заголовок";
+        Console.WriteLine(defaultTeam.ToString());
+                
 
-        int t1Start = Environment.TickCount;
-        for (int i = 0; i < total; i++)
-            oneD[i].Title = newTitle;
-        int t1End = Environment.TickCount;
-        int t1 = t1End - t1Start;
-
-        int t2Start = Environment.TickCount;
-        for (int i = 0; i < nrow; i++)
-            for (int j = 0; j < ncolumn; j++)
-                rect[i, j].Title = newTitle;
-        int t2End = Environment.TickCount;
-        int t2 = t2End - t2Start;
-
-        int t3Start = Environment.TickCount;
-        for (int i = 0; i < nrow; i++)
-            for (int j = 0; j < ncolumn; j++)
-                jag[i][j].Title = newTitle;
-        int t3End = Environment.TickCount;
-        int t3 = t3End - t3Start;
-
-        Console.WriteLine("Сравнение времени операций присваивания свойства Title:");
-        Console.WriteLine($"nrow: {nrow}, ncolumn: {ncolumn}, total: {total}");
-        Console.WriteLine($"Одномерный массив (Paper[]): {t1} мс");
-        Console.WriteLine($"Двумерный прямоугольный (Paper[,]): {t2} мс");
-        Console.WriteLine($"Двумерный ступенчатый (Paper[][]): {t3} мс");
     }
 }
