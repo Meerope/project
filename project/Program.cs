@@ -61,7 +61,25 @@ class Program
         defaultTeam.Papers = new[] {paper1, paper2};
 
         Console.WriteLine(defaultTeam.ToString());
-                
+        Person[] peoples = new Person[3];
+        peoples[0] = new Person("Иван", "Иванов", new DateTime(1985,5,12));
+        peoples[1] = new Person("Анна", "Сидорова",  new DateTime(2000, 3, 15));
+        peoples[2] = new Person("Мария", "Кузнецова",  new DateTime(2000, 3, 15));
+        ResearchTeam cyberSequr = new ResearchTeam();
+        cyberSequr.Topic = "Безопасность";
+        cyberSequr.Organization = "CyberSequre";
+        cyberSequr.RegNumber = 321;
+        cyberSequr.Duration = TimeFrame.Long;
+        cyberSequr.AddPapers(
+            new Paper("Вирус",peoples[0],new DateTime(2020, 1,1)),
+            new Paper("Питон",peoples[0],new DateTime(2023,2,12)),
+            new Paper("Питон",peoples[0],new DateTime(2023,4,21)),
+            new Paper("Питон",peoples[1],new DateTime(2023,7,9)),
+            new Paper("Питон",peoples[1],new DateTime(2023,3,7)),
+            new Paper("С++",peoples[2],new DateTime(2018,11,14))
+            );
+        cyberSequr.showDate(new DateTime(2023,2,12));
+
 
     }
 }

@@ -19,4 +19,5 @@ public class Paper
     {
         return $"Публикация: {Title}, Автор: {Author}, Дата: {Date.ToShortDateString()}";
     }
+    
 }

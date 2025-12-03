@@ -72,6 +72,23 @@ public class ResearchTeam
         if (newPapers == null || newPapers.Length == 0) return;
         papers = papers.Concat(newPapers).ToArray();
     }
+    public void showDate(DateTime date)
+    {
+        bool found = false;
+        foreach (var p in papers)
+        {
+            if (p.Date == date.Date)
+            {
+                Console.WriteLine(p);
+                found = true;
+            }
+
+        }
+        if (!found)
+        {
+            Console.WriteLine("На эту дату нет публицаций");
+        }
+    }
 
     public override string ToString()
     {
