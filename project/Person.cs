@@ -1,56 +1,41 @@
-namespace project;
+using System;
 
-public class Person
+namespace project
 {
-    private string n;       
-    private string s;       
-    private DateTime d;     
-
-    public Person(string n, string s, DateTime d)
+    public class Person : INameAndCopy
     {
-        this.n = n;
-        this.s = s;
-        this.d = d;
-    }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime BirthDate { get; set; }
 
-    public Person()
-    {
-        this.n = "Иван";
-        this.s = "Иванов";
-        this.d = new DateTime(2000, 1, 1);
-    }
+        public Person(string n, string s, DateTime d)
+        {
+            FirstName = n; LastName = s; BirthDate = d;
+        }
+        public Person() : this("Иван", "Иванов", new DateTime(2000, 1, 1)) { }
 
-    public string N
-    {
-        get { return n; }
-        set { n = value; }
-    }
+        public string Name
+        {
+            get => $"{FirstName} {LastName}";
+            set
+            {
+                var parts = value.Split(' ');
+                FirstName = parts[0];
+                LastName = parts.Length > 1 ? parts[1] : "";
+            }
+        }
 
-    public string S
-    {
-        get { return s; }
-        set { s = value; }
-    }
+        public virtual object DeepCopy() => new Person(FirstName, LastName, new DateTime(BirthDate.Ticks));
 
-    public DateTime D
-    {
-        get { return d; }
-        set { d = value; }
-    }
+        public override string ToString() => $"{FirstName} {LastName}, {BirthDate:dd.MM.yyyy}";
+        public virtual string ToShortString() => $"{FirstName} {LastName}";
 
-    public int Y
-    {
-        get { return d.Year; }
-        set { d = new DateTime(value, d.Month, d.Day); }
-    }
+        public override bool Equals(object obj) =>
+            obj is Person p && FirstName == p.FirstName && LastName == p.LastName && BirthDate == p.BirthDate;
 
-    public override string ToString()
-    {
-        return $"Имя: {n}, Фамилия: {s}, Дата рождения: {d.ToShortDateString()}";
-    }
+        public override int GetHashCode() => HashCode.Combine(FirstName, LastName, BirthDate);
 
-    public virtual string ToShortString()
-    {
-        return $"{n} {s}";
+        public static bool operator ==(Person a, Person b) => Equals(a, b);
+        public static bool operator !=(Person a, Person b) => !Equals(a, b);
     }
 }

@@ -1,105 +1,81 @@
-namespace project;
-
 using System;
+using System.Collections;
 using System.Linq;
 
-public class ResearchTeam
+namespace project
 {
-    private string topic;
-    private string organization;
-    private int regNumber;
-    private TimeFrame duration;
-    private Paper[] papers;
-
-    public ResearchTeam(string topic, string organization, int regNumber, TimeFrame duration)
+    public class ResearchTeam : Team, IEnumerable
     {
-        this.topic = topic;
-        this.organization = organization;
-        this.regNumber = regNumber;
-        this.duration = duration;
-        this.papers = new Paper[0];
-    }
+        private string topic;
+        private TimeFrame duration;
+        private ArrayList members = new ArrayList();
+        private ArrayList papers = new ArrayList();
 
-    public ResearchTeam() : this("Тема по умолчанию", "Организация по умолчанию", 0, TimeFrame.Year) { }
-
-    public string Topic
-    {
-        get => topic;
-        set => topic = value;
-    }
-
-    public string Organization
-    {
-        get => organization;
-        set => organization = value;
-    }
-
-    public int RegNumber
-    {
-        get => regNumber;
-        set => regNumber = value;
-    }
-
-    public TimeFrame Duration
-    {
-        get => duration;
-        set => duration = value;
-    }
-
-    public Paper[] Papers
-    {
-        get => papers;
-        set => papers = value;
-    }
-
-    public Paper LatestPaper
-    {
-        get
+        public ResearchTeam(string org, string topic, int reg, TimeFrame dur) : base(org, reg)
         {
-            if (papers == null || papers.Length == 0)
-                return null;
-            return papers.OrderByDescending(p => p.Date).FirstOrDefault();
+            this.topic = topic; duration = dur;
         }
-    }
+        public ResearchTeam() : this("Орг по умолчанию", "Тема по умолчанию", 1, TimeFrame.Year) { }
 
-    public bool this[TimeFrame tf]
-    {
-        get => duration == tf;
-    }
+        public string Topic { get => topic; set => topic = value; }
+        public TimeFrame Duration { get => duration; set => duration = value; }
+        public ArrayList Members => members;
+        public ArrayList Papers => papers;
 
-    public void AddPapers(params Paper[] newPapers)
-    {
-        if (newPapers == null || newPapers.Length == 0) return;
-        papers = papers.Concat(newPapers).ToArray();
-    }
-    public void showDate(DateTime date)
-    {
-        bool found = false;
-        foreach (var p in papers)
+        public Paper LatestPaper => papers.Count == 0 ? null :
+            papers.Cast<Paper>().OrderByDescending(p => p.Date).FirstOrDefault();
+
+        public bool this[TimeFrame tf] => duration == tf;
+
+        public void AddMembers(params Person[] persons) { foreach (var p in persons) members.Add(p); }
+        public void AddPapers(params Paper[] ps) { foreach (var p in ps) papers.Add(p); }
+
+        public override string ToString()
         {
-            if (p.Date == date.Date)
-            {
-                Console.WriteLine(p);
-                found = true;
-            }
-
+            string mems = members.Count == 0 ? "Нет участников" : string.Join("; ", members.Cast<Person>());
+            string pubs = papers.Count == 0 ? "Нет публикаций" : string.Join("; ", papers.Cast<Paper>());
+            return $"{base.ToString()}, Тема: {topic}, Длительность: {duration}\nУчастники: {mems}\nПубликации: {pubs}";
         }
-        if (!found)
+        public string ToShortString() => $"{base.ToString()}, Тема: {topic}, Длительность: {duration}";
+
+        public override object DeepCopy()
         {
-            Console.WriteLine("На эту дату нет публицаций");
+            var copy = new ResearchTeam(organization, topic, regNumber, duration);
+            foreach (Person m in members) copy.members.Add(m.DeepCopy());
+            foreach (Paper p in papers) copy.papers.Add(p.DeepCopy());
+            return copy;
         }
-    }
 
-    public override string ToString()
-    {
-        string papersInfo = papers.Length == 0 ? "Нет публикаций" :
-            string.Join("\n", papers.Select(p => p.ToString()));
-        return $"Тема: {topic}, Организация: {organization}, Рег. номер: {regNumber}, " +
-               $"Продолжительность: {duration}\nПубликации:\n{papersInfo}";
-    }
+        // Итераторы
+        public IEnumerable<Person> MembersWithoutPapers()
+        {
+            foreach (Person m in members)
+                if (!papers.Cast<Paper>().Any(p => p.Author == m))
+                    yield return m;
+        }
+        public IEnumerable<Paper> PapersLastNYears(int n)
+        {
+            DateTime cutoff = DateTime.Now.AddYears(-n);
+            foreach (Paper p in papers)
+                if (p.Date > cutoff) yield return p;
+        }
+        public IEnumerable<Person> MembersWithMoreThanOnePublication()
+        {
+            foreach (Person m in members)
+                if (papers.Cast<Paper>().Count(p => p.Author == m) > 1)
+                    yield return m;
+        }
+        public IEnumerable<Paper> PapersLastYear()
+        {
+            DateTime cutoff = DateTime.Now.AddYears(-1);
+            foreach (Paper p in papers)
+                if (p.Date > cutoff) yield return p;
+        }
 
-    public virtual string ToShortString()
-    {
-        return $"Тема: {topic}, Организация: {organization}, Рег. номер: {regNumber}, Продолжительность: {duration}";
+        // IEnumerable: участники с публикациями
+        public IEnumerator GetEnumerator()
+        {
+            return members.Cast<Person>().Where(m => papers.Cast<Paper>().Any(p => p.Author == m)).GetEnumerator();
+        }
     }
 }

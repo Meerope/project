@@ -1,23 +1,22 @@
-namespace project;
+using System;
 
-public class Paper
+namespace project
 {
-    public string Title { get; set; }
-    public Person Author { get; set; }
-    public DateTime Date { get; set; }
-
-    public Paper(string title, Person author, DateTime date)
+    public class Paper : INameAndCopy
     {
-        Title = title;
-        Author = author;
-        Date = date;
-    }
+        public string Title { get; set; }
+        public Person Author { get; set; }
+        public DateTime Date { get; set; }
 
-    public Paper() : this("Без названия", new Person(), DateTime.MinValue) { }
+        public Paper(string title, Person author, DateTime date)
+        {
+            Title = title; Author = author; Date = date;
+        }
+        public Paper() : this("Без названия", new Person(), DateTime.MinValue) { }
 
-    public override string ToString()
-    {
-        return $"Публикация: {Title}, Автор: {Author}, Дата: {Date.ToShortDateString()}";
+        public string Name { get => Title; set => Title = value; }
+        public virtual object DeepCopy() => new Paper(Title, (Person)Author.DeepCopy(), new DateTime(Date.Ticks));
+
+        public override string ToString() => $"{Title}, {Author.ToShortString()}, {Date:dd.MM.yyyy}";
     }
-    
 }

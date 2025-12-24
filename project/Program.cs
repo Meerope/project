@@ -1,85 +1,92 @@
-﻿namespace project;
-class Program
+﻿using System;
+
+namespace project
 {
-    static void Main()
+    class Program
     {
-        // Задание 1
-        Person p1 = new Person();
-        Person p2 = new Person("Иван", "Иванов", new DateTime(1985, 5, 12));
-        Console.WriteLine(p1.ToShortString());
-        Console.WriteLine(p1.ToString());
-        Console.WriteLine(p2.ToShortString());
-        Console.WriteLine(p2.ToString());
+        static void Main()
+        {
+            // 1. Два Team с совпадающими данными
+            Team t1 = new Team("Org", 123);
+            Team t2 = new Team("Org", 123);
+            Console.WriteLine($"Ссылки равны: {ReferenceEquals(t1, t2)}");
+            Console.WriteLine($"Объекты равны (Equals): {t1.Equals(t2)}");
+            Console.WriteLine($"==: {t1 == t2}, !=: {t1 != t2}");
+            Console.WriteLine($"Hash1: {t1.GetHashCode()}, Hash2: {t2.GetHashCode()}");
+            Console.WriteLine();
 
-        // Задание 2
-        Person anna = new Person("Анна", "Сидоровна", new DateTime(2000, 3, 15));
-        anna.Y = 1999;
+            // 19. Исключение при некорректном рег. номере
+            try
+            {
+                t1.RegNumber = 0;
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Исключение: {ex.Message}");
+            }
+            Console.WriteLine();
 
-        // Задание 3
-        TimeFrame year = TimeFrame.Year;
-        TimeFrame twoYears = TimeFrame.TwoYears;
-        TimeFrame longTime = TimeFrame.Long;
+            // 20. Создать ResearchTeam, добавить участников и публикации
+            var rt = new ResearchTeam("BioCenter", "Генетика", 202, TimeFrame.TwoYears);
+            var p1 = new Person("Иван", "Иванов", new DateTime(1985, 5, 12));
+            var p2 = new Person("Анна", "Сидорова", new DateTime(2000, 3, 15));
+            var p3 = new Person("Мария", "Кузнецова", new DateTime(1990, 10, 10));
 
-        Console.WriteLine(year);
-        Console.WriteLine(twoYears);
-        Console.WriteLine(longTime);
-
-        // Задание 4
-        Person petr =  new Person("Пётр", "Петров", new DateTime(1970, 1, 1));
-        Paper paper = new Paper("Современные технологии", petr, new DateTime(2020, 1, 20));
-        Console.WriteLine(paper.ToString());
-
-        // Задание 5
-        Person maria = new Person("Мария", "Кузнецова", new DateTime(1980, 10, 10));
-        Paper paper3 = new Paper("Наука и жизнь", maria,  new DateTime(2019, 5, 15));
-        paper3.Title = "Научные открытия";
-        paper3.Date = new DateTime(2021, 6, 1);
-
-        // Задание 6
-        ResearchTeam ai = new ResearchTeam("Искуственный Интеллект", "TechLab", 101, TimeFrame.Year);
-        Console.WriteLine(ai.ToShortString());
-
-        // Задание 7
-        ResearchTeam genetika = new ResearchTeam("Генетика", "BioCenter", 202, TimeFrame.TwoYears);
-        Console.WriteLine(genetika[TimeFrame.Year]);
-        Console.WriteLine(genetika[TimeFrame.TwoYears]);
-        Console.WriteLine(genetika[TimeFrame.Long]);
-
-        // Задание 8
-        ResearchTeam defaultTeam = new ResearchTeam();
-        defaultTeam.Topic = "Космос";
-        defaultTeam.Organization = "SpaceCorp";
-        defaultTeam.RegNumber = 303;
-        defaultTeam.Duration = TimeFrame.Long;
-
-        Person author1 = new Person("Иван", "Иванов",  new DateTime(1985, 5, 12));
-        Person author2 = new Person("Анна", "Сидорова",  new DateTime(2000, 3, 15));
-
-        Paper paper1 = new Paper("Марс", author1, new DateTime(2020, 1, 1));
-        Paper paper2 = new Paper("Луна", author1, new DateTime(2021, 6, 1));
-
-        defaultTeam.Papers = new[] {paper1, paper2};
-
-        Console.WriteLine(defaultTeam.ToString());
-        Person[] peoples = new Person[3];
-        peoples[0] = new Person("Иван", "Иванов", new DateTime(1985,5,12));
-        peoples[1] = new Person("Анна", "Сидорова",  new DateTime(2000, 3, 15));
-        peoples[2] = new Person("Мария", "Кузнецова",  new DateTime(2000, 3, 15));
-        ResearchTeam cyberSequr = new ResearchTeam();
-        cyberSequr.Topic = "Безопасность";
-        cyberSequr.Organization = "CyberSequre";
-        cyberSequr.RegNumber = 321;
-        cyberSequr.Duration = TimeFrame.Long;
-        cyberSequr.AddPapers(
-            new Paper("Вирус",peoples[0],new DateTime(2020, 1,1)),
-            new Paper("Питон",peoples[0],new DateTime(2023,2,12)),
-            new Paper("Питон",peoples[0],new DateTime(2023,4,21)),
-            new Paper("Питон",peoples[1],new DateTime(2023,7,9)),
-            new Paper("Питон",peoples[1],new DateTime(2023,3,7)),
-            new Paper("С++",peoples[2],new DateTime(2018,11,14))
+            rt.AddMembers(p1, p2, p3);
+            rt.AddPapers(
+                new Paper("Марс", p1, new DateTime(2020, 1, 1)),
+                new Paper("Луна", p1, new DateTime(2021, 6, 1)),
+                new Paper("Гены", p2, new DateTime(2024, 2, 10)),
+                new Paper("Эпигенетика", p2, new DateTime(2023, 7, 9)),
+                new Paper("С++", p3, new DateTime(2018, 11, 14))
             );
-        cyberSequr.showDate(new DateTime(2023,2,12));
+            Console.WriteLine(rt.ToString());
+            Console.WriteLine();
 
+            // 21. Вывести значение свойства Team
+            Console.WriteLine();
 
+            // 22. DeepCopy() -> изменить исходный, проверить независимость
+            var rtCopy = (ResearchTeam)rt.DeepCopy();
+            rt.Organization = "NewOrg";
+            rt.Topic = "Нейросети";
+            ((Person)rt.Members[0]).FirstName = "Переименован";
+            ((Paper)rt.Papers[0]).Title = "Изменённая публикация";
+
+            Console.WriteLine("Исходный изменённый объект:");
+            Console.WriteLine(rt.ToString());
+            Console.WriteLine("\nКопия должна остаться без изменений:");
+            Console.WriteLine(rtCopy.ToString());
+            Console.WriteLine();
+
+            // 23. foreach: участники без публикаций
+            Console.WriteLine("Участники без публикаций:");
+            foreach (var person in rt.MembersWithoutPapers())
+                Console.WriteLine(person.ToShortString());
+            Console.WriteLine();
+
+            // 24. foreach: публикации за последние два года
+            Console.WriteLine("Публикации за последние 2 года:");
+            foreach (var paper in rt.PapersLastNYears(2))
+                Console.WriteLine(paper.ToString());
+            Console.WriteLine();
+
+            // 25. IEnumerable: участники с публикациями
+            Console.WriteLine("Участники с публикациями (IEnumerable):");
+            foreach (Person person in rt)
+                Console.WriteLine(person.ToShortString());
+            Console.WriteLine();
+
+            // 26. Итератор: участники с более чем одной публикацией
+            Console.WriteLine("Участники с более чем одной публикацией:");
+            foreach (var person in rt.MembersWithMoreThanOnePublication())
+                Console.WriteLine(person.ToShortString());
+            Console.WriteLine();
+
+            // 27. Итератор: публикации за последний год
+            Console.WriteLine("Публикации за последний год:");
+            foreach (var paper in rt.PapersLastYear())
+                Console.WriteLine(paper.ToString());
+        }
     }
 }
